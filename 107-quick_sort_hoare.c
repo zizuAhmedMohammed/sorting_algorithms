@@ -2,100 +2,74 @@
 #include <stdio.h>
 
 /**
- * swap - swap integers at positions `i` and `j` in `array`
- * @array: array to swap positions
- * @i: left index
- * @j: right index
+ * partition - finds the partition for the quicksort using the Hoare scheme
+ * @array: array to sort
+ * @lo: lowest index of the partition to sort
+ * @hi: highest index of the partition to sort
+ * @size: size of the array
+ *
+ * Return: index of the partition
  */
-void swap(int *array, int i, int j)
+size_t partition(int *array, ssize_t lo, ssize_t hi, size_t size)
 {
-	int tmp;
+	int swap, pivot;
 
-	tmp = array[i];
-	array[i] = array[j];
-	array[j] = tmp;
+	pivot = array[hi];
+	while (lo <= hi)
+	{
+		while (array[lo] < pivot)
+			lo++;
+		while (array[hi] > pivot)
+			hi--;
+		if (lo <= hi)
+		{
+			if (lo != hi)
+			{
+				swap = array[lo];
+				array[lo] = array[hi];
+				array[hi] = swap;
+				print_array(array, size);
+			}
+			lo++;
+			hi--;
+		}
+	}
+	return (hi);
 }
 
 /**
- * partition - partition subarray of `array` around pivot using
- * Hoare method (always choose right element).
- * @array: array to partition
- * @left: left end of subarray
- * @right: right end of subarray
- * @size: size of array
- * Return: index of pivot after it has been sorted
+ * quicksort - sorts a partition of an array of integers
+ * @array: array to sort
+ * @lo: lowest index of the partition to sort
+ * @hi: highest index of the partition to sort
+ * @size: size of the array
+ *
+ * Return: void
  */
-int partition(int *array, int left, int right, size_t size)
+void quicksort(int *array, ssize_t lo, ssize_t hi, size_t size)
 {
-	int i, j, pivot;
+	ssize_t pivot;
 
-	if (left >= right)
-		return (left);
-	swap(array, left, right);
-	print_array(array, size);
-	pivot = array[left];
-	i = left;
-	j = right + 1;
-	while (1)
+	if (lo < hi)
 	{
-		do {
-			i++;
-		} while (array[i] <= pivot && i < right);
+		pivot = partition(array, lo, hi, size);
+		quicksort(array, lo, pivot, size);
+		quicksort(array, pivot + 1, hi, size);
 
-		do {
-			j--;
-		} while (array[j] > pivot && j > i);
-
-		if (i == j)
-		{
-			swap(array, i - 1, left);
-			print_array(array, size);
-			return (i - 1);
-		}
-		if (i == right && pivot < array[right])
-		{
-			swap(array, left, right - 1);
-			print_array(array, size);
-			return (right - 1);
-		}
-		if (i == right && pivot > array[right])
-		{
-			swap(array, left, right);
-			print_array(array, size);
-			return (right);
-		}
-		swap(array, i, j);
-		print_array(array, size);
 	}
 }
 
 /**
- * _quick_sort_hoare - recursively partition array until it is fully sorted
- * @array: array to sort
- * @left: left side of subarray for recursion
- * @right: right side of subarray for recursion
- * @size: size of array
- */
-void _quick_sort_hoare(int *array, int left, int right, size_t size)
-{
-	int p;
-
-	if (left < right)
-	{
-		p = partition(array, left, right, size);
-		_quick_sort_hoare(array, left, p - 1, size);
-		_quick_sort_hoare(array, p + 1, right, size);
-	}
-}
-
-/**
- * quick_sort_hoare - wrapper around recursive quicksort function
- * @array: array to sort
- * @size: size of array
+ * quick_sort_hoare - sorts an array of integers in ascending order using the
+ * Quick sort algorithm
+ * @array: The array to sort
+ * @size: The size of the array
+ *
+ * Return: void
  */
 void quick_sort_hoare(int *array, size_t size)
 {
 	if (array == NULL || size < 2)
 		return;
-	_quick_sort_hoare(array, 0, (int)(size - 1), size);
+	quicksort(array, 0, size - 1, size);
 }
